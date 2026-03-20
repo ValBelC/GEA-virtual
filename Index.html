@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Mini Juegos</title>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        display: flex;
+        height: 100vh;
+    }
+
+    .section {
+        flex: 1;
+        border: 1px solid black;
+        padding: 10px;
+        overflow: auto;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    /* Cartas */
+    .cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .card {
+        width: 50px;
+        height: 70px;
+        background: lightblue;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 20px;
+        cursor: grab;
+        border-radius: 5px;
+    }
+
+    /* Letras */
+    .letters {
+        font-size: 24px;
+        text-align: center;
+        margin: 10px;
+    }
+
+    input {
+        width: 80%;
+        padding: 5px;
+        font-size: 16px;
+    }
+
+    button {
+        margin-top: 5px;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Juego 1 -->
+    <div class="section">
+        <h2>Ordena los números</h2>
+        <div id="cards" class="cards"></div>
+        <button onclick="checkOrder()">Verificar</button>
+        <p id="result1"></p>
+    </div>
+
+    <!-- Juego 2 -->
+    <div class="section">
+        <h2>Forma palabras</h2>
+        <div id="letters" class="letters"></div>
+        <input type="text" id="wordInput" placeholder="Escribe palabra">
+        <button onclick="addWord()">Agregar</button>
+        <ul id="wordList"></ul>
+    </div>
+
+    <!-- Juego 3 -->
+    <div class="section">
+        <h2>Próximamente...</h2>
+    </div>
+
+</div>
+
+<script>
+/* ===== JUEGO 1: ORDENAR CARTAS ===== */
+
+let numbers = [];
+for (let i = 1; i <= 12; i++) numbers.push(i);
+
+// Mezclar
+numbers.sort(() => Math.random() - 0.5);
+
+const cardsContainer = document.getElementById("cards");
+
+numbers.forEach(num => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerText = num;
+    div.draggable = true;
+
+    div.addEventListener("dragstart", dragStart);
+    div.addEventListener("dragover", dragOver);
+    div.addEventListener("drop", drop);
+
+    cardsContainer.appendChild(div);
+});
+
+let dragged;
+
+function dragStart(e) {
+    dragged = e.target;
+}
+
+function dragOver(e) {
+    e.preventDefault();
+}
+
+function drop(e) {
+    e.preventDefault();
+    if (e.target.classList.contains("card")) {
+        let temp = dragged.innerText;
+        dragged.innerText = e.target.innerText;
+        e.target.innerText = temp;
+    }
+}
+
+function checkOrder() {
+    const cards = document.querySelectorAll(".card");
+    let correct = true;
+
+    cards.forEach((card, index) => {
+        if (parseInt(card.innerText) !== index + 1) {
+            correct = false;
+        }
+    });
+
+    document.getElementById("result1").innerText =
+        correct ? "✅ Correcto!" : "❌ Intenta otra vez";
+}
+
+/* ===== JUEGO 2: FORMAR PALABRAS ===== */
+
+const letters = ["A", "E", "O", "S", "R", "T"];
+document.getElementById("letters").innerText = letters.join(" ");
+
+function addWord() {
+    const input = document.getElementById("wordInput");
+    const word = input.value.toUpperCase();
+
+    if (!word) return;
+
+    // Validar letras
+    let valid = word.split("").every(letter => letters.includes(letter));
+
+    if (!valid) {
+        alert("Usa solo las letras dadas");
+        return;
+    }
+
+    const li = document.createElement("li");
+    li.innerText = word;
+    document.getElementById("wordList").appendChild(li);
+
+    input.value = "";
+}
+</script>
+
+</body>
+</html>
